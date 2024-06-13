@@ -1,5 +1,4 @@
 import pandas as pd
-import geopandas as gpd
 import psycopg2
 from sqlalchemy import create_engine
 from datetime import datetime
@@ -24,7 +23,7 @@ def load_data(db_params):
 
     # Load the GeoPackage layer
     # gdf1 = gpd.read_postgis('SELECT p_id, leakage_prob, geom FROM gis_data.pipes', engine, geom_col='geom')
-    gdf1 = pd.read_sql('SELECT p_id, leakage_prob FROM gis_data.pipes', engine)
+    gdf1 = pd.read_sql('SELECT p_id, probability FROM gis_data_test.pipes', engine)
 
     # Load the leakage probability table
     df2 = pd.read_sql('SELECT * FROM gis_data.leakage_prob', engine)
@@ -44,8 +43,8 @@ def filter_latest_records(df2, user_date):
 
 # Function to update leakage probability in the first table
 def update_leakage_probability(gdf1, latest_records):
-    merged_df = gdf1.merge(latest_records[['p_id', 'leakage_prob']], on='p_id', suffixes=('', '_latest'), how='left')
-    gdf1['leakage_prob'] = merged_df['leakage_prob_latest'].combine_first(gdf1['leakage_prob'])
+    merged_df = gdf1.merge(latest_records[['p_id', 'probability']], on='p_id', suffixes=('', '_latest'), how='left')
+    gdf1['probability'] = merged_df['probability_latest'].combine_first(gdf1['probability'])
     return gdf1
 
 
@@ -55,13 +54,13 @@ def execute_update(gdf1, db_params):
     cursor = conn.cursor()
 
     update_query = """
-        UPDATE gis_data.pipes
-        SET leakage_prob = data.leakage_prob
-        FROM (VALUES %s) AS data (id, leakage_prob)
+        UPDATE gis_data_test.pipes
+        SET probability = data.probability
+        FROM (VALUES %s) AS data (id, probability)
         WHERE pipes.p_id = data.id;
     """
 
-    update_data = list(zip(gdf1['p_id'], gdf1['leakage_prob']))
+    update_data = list(zip(gdf1['p_id'], gdf1['probability']))
     execute_values(cursor, update_query, update_data)
 
     conn.commit()
@@ -81,7 +80,7 @@ def main():
     }
 
     # user_date = get_user_date()
-    user_date = "2024-06-03"
+    user_date = "2018-01-01"
     gdf1, df2 = load_data(db_params)
     latest_records = filter_latest_records(df2, user_date)
     updated_gdf1 = update_leakage_probability(gdf1, latest_records)
