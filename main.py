@@ -41,69 +41,6 @@ def find_layer(project, layer_name):
         print(f"Error finding layer: {e}")
         sys.exit(1)
 
-
-# def get_color_for_attribute(attribute_value):
-#     """Define your custom logic for assigning colors based on attribute values."""
-    # color_map = {
-    #     1: QColor.fromRgb(255, 0, 0),  # Red for ID 1
-    #     2: QColor.fromRgb(0, 255, 0),  # Green for ID 2
-    #     3: QColor.fromRgb(0, 0, 255),  # Blue for ID 3
-    #     # Add more mappings as needed
-    # }
-    # return color_map.get(attribute_value, QColor.fromRgb(0, 0, 0))  # Default to black
-    #
-    # color_category = ()
-    # if 0 <= attribute_value < 0.40:
-    #     return QColor.fromRgb(0, 0, 255), 'Blue'  # Blue
-    # elif 0.40 <= attribute_value < 0.60:
-    #     return QColor.fromRgb(255, 255, 0), 'Yellow'  # Yellow
-    # elif 0.60 <= attribute_value <= 1:
-    #     return QColor.fromRgb(255, 0, 0), 'Red'  # Red
-    # else:
-    #     return QColor.fromRgb(0, 0, 0)  # Default to black
-
-
-# def modify_layer_colors_based_on_attribute(layer, attribute_name):
-#     try:
-#         categories = []
-#         unique_values = layer.uniqueValues(layer.fields().lookupField(attribute_name))
-#
-#
-#         for value in unique_values:
-#             # print(get_color_for_attribute(value))
-#             color, legend = get_color_for_attribute(value)
-#             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
-#             symbol.setColor(color)
-#             category = QgsRendererCategory(value, symbol, legend)
-#             categories.append(category)
-#
-#         # Create categories based on intervals and assign legend names
-#         # category = QgsRendererCategory("Low Leakage (0 - 0.4)", QgsSymbol.defaultSymbol(layer.geometryType()),
-#         #                                "hi")
-#         # # category.setColor(QColor.fromRgb(0, 0, 255))
-#         # categories.append(category)
-#         #
-#         # category = QgsRendererCategory("Medium Leakage (0.4 - 0.6)", QgsSymbol.defaultSymbol(layer.geometryType()),
-#         #                                "Medium Leakage (0.4 - 0.6)")
-#         # # category.setColor(QColor.fromRgb(255, 255, 0))
-#         # categories.append(category)
-#         #
-#         # category = QgsRendererCategory("High Leakage (0.6 - 1)", QgsSymbol.defaultSymbol(layer.geometryType()),
-#         #                                "High Leakage (0.6 - 1)")
-#         # # category.setColor(QColor.fromRgb(255, 0, 0))
-#         # categories.append(category)
-#
-#         renderer = QgsCategorizedSymbolRenderer(attribute_name, categories)
-#         if not renderer:
-#             print("Error creating categorized renderer for the layer")
-#             return False
-#
-#         layer.setRenderer(renderer)
-#         layer.triggerRepaint()
-#         return True
-#     except Exception as e:
-#         print(f"Error modifying layer colors: {e}")
-#         return False
 def modify_layer_colors_based_on_attribute(layer, attribute_name):
     try:
         # Define the rules and their expressions
