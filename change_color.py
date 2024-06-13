@@ -6,7 +6,7 @@ from qgis.core import (
     QgsSymbol,
 )
 import sys
-import docker
+import subprocess
 
 
 def initialize_qgis(prefix_path=''):
@@ -98,21 +98,19 @@ def save_project_to_postgis(project, uri):
         sys.exit(1)
         
         
-def reload_qgis_server():
-    # Connect to Docker daemon
-    client = docker.from_env()
+  
 
+def reload_qgis_server():
     # Specify your project name and the service (container) name to restart
     project_name = 'qwc-docker'
     service_name = 'qwc-qgis-server'
 
     # Restart the specific service
     try:
-        client.compose.restart(project=project_name, services=[service_name])
+        subprocess.check_call(['docker-compose', '-p', project_name, 'restart', service_name])
         print(f"Successfully restarted service '{service_name}' in Docker Compose project '{project_name}'.")
-    except docker.errors.APIError as e:
-        print(f"Failed to restart service '{service_name}' in Docker Compose project '{project_name}': {e}")
-    
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to restart service '{service_name}' in Docker Compose project '{project_name}': {e}")    
 
 
 def main():
@@ -137,7 +135,7 @@ def main():
     project = load_project_from_postgis(uri)
 
     layer_name = "pipes"
-    attribute_name = "leakage_prob"  # Replace with your attribute name
+    attribute_name = "probability"  # Replace with your attribute name
     the_layer = find_layer(project, layer_name)
 
     if the_layer:
@@ -149,6 +147,7 @@ def main():
         print("Layer modification skipped due to missing layer")
 
     qgs.exitQgis()
+    reload_qgis_server()
 
 
 if __name__ == "__main__":
