@@ -100,10 +100,8 @@ def save_project_to_postgis(project, uri):
         
   
 
-def reload_qgis_server():
-    # Specify your project name and the service (container) name to restart
-    project_name = 'qwc-docker'
-    service_name = 'qwc-qgis-server'
+def reload_qgis_server(project_name,service_name):
+    
 
     # Restart the specific service
     try:
@@ -147,7 +145,12 @@ def main():
         print("Layer modification skipped due to missing layer")
 
     qgs.exitQgis()
-    reload_qgis_server()
+    
+    # Specify your project name and the service (container) name to restart
+    project_name = 'qwc-docker'
+    service_name = 'qwc-qgis-server'
+    
+    reload_qgis_server(project_name,service_name)
 
 
 if __name__ == "__main__":
