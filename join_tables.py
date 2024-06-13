@@ -79,8 +79,8 @@ def main():
         'port': '5432'
     }
 
-    # user_date = get_user_date()
-    user_date = "2018-01-01"
+    user_date = get_user_date()
+    # user_date = "2018-01-01"
     gdf1, df2 = load_data(db_params)
     latest_records = filter_latest_records(df2, user_date)
     updated_gdf1 = update_leakage_probability(gdf1, latest_records)

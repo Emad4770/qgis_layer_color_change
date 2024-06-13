@@ -100,15 +100,15 @@ def save_project_to_postgis(project, uri):
         
   
 
-def reload_qgis_server(project_name,service_name):
+def reload_qgis_server(project_path,service_name):
     
 
     # Restart the specific service
     try:
-        subprocess.check_call(['docker-compose', '-p', project_name, 'restart', service_name])
-        print(f"Successfully restarted service '{service_name}' in Docker Compose project '{project_name}'.")
+        subprocess.check_call(['docker','compose', '-f', f'{project_path}/docker-compose.yml', 'restart', service_name])
+        print(f"Successfully restarted service '{service_name}' in Docker Compose project '{project_path}'.")
     except subprocess.CalledProcessError as e:
-        print(f"Failed to restart service '{service_name}' in Docker Compose project '{project_name}': {e}")    
+        print(f"Failed to restart service '{service_name}' in Docker Compose project '{project_path}': {e}")    
 
 
 def main():
@@ -147,10 +147,10 @@ def main():
     qgs.exitQgis()
     
     # Specify your project name and the service (container) name to restart
-    project_name = 'qwc-docker'
+    project_path = 'C:\Users\Emad\qwc-docker'
     service_name = 'qwc-qgis-server'
     
-    reload_qgis_server(project_name,service_name)
+    reload_qgis_server(project_path,service_name)
 
 
 if __name__ == "__main__":
