@@ -1,5 +1,7 @@
 README
-QGIS Project Management
+
+QGIS Layer Color Changer
+
 This Python script provides a set of functions to manage QGIS projects. It uses the PyQt5 and QGIS libraries to initialize a QGIS application, load a project from a PostGIS database, and find a specific layer within a project and change its color and symbology based on rule-based symbology
 
 Dependencies
