@@ -6,6 +6,7 @@ from qgis.core import (
     QgsSymbol,
 )
 import sys
+import docker
 
 
 def initialize_qgis(prefix_path=''):
@@ -95,6 +96,23 @@ def save_project_to_postgis(project, uri):
     except Exception as e:
         print(f"Error saving project to PostGIS: {e}")
         sys.exit(1)
+        
+        
+def reload_qgis_server():
+    # Connect to Docker daemon
+    client = docker.from_env()
+
+    # Specify your project name and the service (container) name to restart
+    project_name = 'qwc-docker'
+    service_name = 'qwc-qgis-server'
+
+    # Restart the specific service
+    try:
+        client.compose.restart(project=project_name, services=[service_name])
+        print(f"Successfully restarted service '{service_name}' in Docker Compose project '{project_name}'.")
+    except docker.errors.APIError as e:
+        print(f"Failed to restart service '{service_name}' in Docker Compose project '{project_name}': {e}")
+    
 
 
 def main():
