@@ -1,9 +1,11 @@
-from PyQt5.QtGui import QColor
-from qgis._core import QgsRuleBasedRenderer
+# from PyQt5.QtGui import QColor
+# from qgis._core import QgsRuleBasedRenderer
 from qgis.core import (
+    QgsRuleBasedRenderer,
     QgsApplication,
     QgsProject,
     QgsSymbol,
+    QgsSymbolLayerUtils
 )
 import sys
 import subprocess
@@ -47,12 +49,12 @@ def modify_layer_colors_based_on_attribute(layer, attribute_name):
         # Define the rules and their expressions
         rules = [
             {"label": "Low Leakage (0 - 40%)", "expression": f'"{attribute_name}" >= 0 AND "{attribute_name}" < 0.40',
-             "color": QColor.fromRgb(0, 0, 255), "width": 0.75},
+             "color": "#0000FF", "width": 0.75},
             {"label": "Medium Leakage (40% - 60%)",
              "expression": f'"{attribute_name}" >= 0.40 AND "{attribute_name}" < 0.60',
-             "color": QColor.fromRgb(255, 255, 0),"width": 0.75},
+             "color": "#FFFF00","width": 0.75},
             {"label": "High Leakage (60% - 100%)", "expression": f'"{attribute_name}" >= 0.60 AND "{attribute_name}" <= 1',
-             "color": QColor.fromRgb(255, 0, 0),"width": 0.75},
+             "color": "#FF0000","width": 0.75},
         ]
 
         # Create the root rule
@@ -62,7 +64,12 @@ def modify_layer_colors_based_on_attribute(layer, attribute_name):
         for rule in rules:
             # Create a new symbol
             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
-            symbol.setColor(rule["color"])
+            # color = rule["color"]
+            # symbol.setColor(QgsSymbol.Color(*color))
+            symbol.setColor(QgsSymbolLayerUtils.decodeColor(rule["color"]))
+            print(rule["color"])
+            print(QgsSymbolLayerUtils.decodeColor(rule["color"]))
+
             symbol.symbolLayer(0).setWidth(rule["width"])
 
 
@@ -122,7 +129,7 @@ def main():
         'user': 'postgres',
         'password': 'admin',
         'schema': 'qgs_projects',
-        'project': 'testproject'
+        'project': 'network_cyprus'
     }
 
     # Define the URI for the PostGIS database
@@ -132,7 +139,7 @@ def main():
 
     project = load_project_from_postgis(uri)
 
-    layer_name = "pipes"
+    layer_name = "pipe"
     attribute_name = "probability"  # Replace with your attribute name
     the_layer = find_layer(project, layer_name)
 
@@ -147,10 +154,10 @@ def main():
     qgs.exitQgis()
     
     # Specify your project name and the service (container) name to restart
-    project_path = 'C:\Users\Emad\qwc-docker'
-    service_name = 'qwc-qgis-server'
+    # project_path = 'C:\Users\Emad\qwc-docker'
+    # service_name = 'qwc-qgis-server'
     
-    reload_qgis_server(project_path,service_name)
+    # reload_qgis_server(project_path,service_name)
 
 
 if __name__ == "__main__":
