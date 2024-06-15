@@ -65,6 +65,7 @@ def modify_layer_colors_based_on_attribute(layer, attribute_name):
             # Create a new symbol
             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
             symbol.setColor(QgsSymbolLayerUtils.decodeColor(rule["color"]))
+            # print(QgsSymbolLayerUtils.decodeColor(rule["color"]))
             symbol.symbolLayer(0).setWidth(rule["width"])
 
 
@@ -81,6 +82,8 @@ def modify_layer_colors_based_on_attribute(layer, attribute_name):
 
         # Apply the new renderer to the layer
         layer.setRenderer(rule_based_renderer)
+        # print(f'layer color: {rule_based_renderer.rootRule().children()[1].symbol().symbolLayer(0).color().name()}')
+        # print(layer.setRenderer(rule_based_renderer))
 
         # Refresh the layer to apply changes
         layer.triggerRepaint()
