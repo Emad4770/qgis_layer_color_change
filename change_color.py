@@ -64,12 +64,7 @@ def modify_layer_colors_based_on_attribute(layer, attribute_name):
         for rule in rules:
             # Create a new symbol
             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
-            # color = rule["color"]
-            # symbol.setColor(QgsSymbol.Color(*color))
             symbol.setColor(QgsSymbolLayerUtils.decodeColor(rule["color"]))
-            print(rule["color"])
-            print(QgsSymbolLayerUtils.decodeColor(rule["color"]))
-
             symbol.symbolLayer(0).setWidth(rule["width"])
 
 
