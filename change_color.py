@@ -1,19 +1,22 @@
-# from PyQt5.QtGui import QColor
-# from qgis._core import QgsRuleBasedRenderer
 from qgis.core import (
     QgsRuleBasedRenderer,
     QgsApplication,
     QgsProject,
     QgsSymbol,
-    QgsSymbolLayerUtils
+    QgsSymbolLayerUtils,
+
 )
 import sys
 import subprocess
+import os
+
+# Set the DISPLAY environment variable (to be used in a headless env with xvfb)
+os.environ['DISPLAY'] = ':99'
 
 
 def initialize_qgis(prefix_path=''):
     try:
-        QgsApplication.setPrefixPath(prefix_path, True)
+        # QgsApplication.setPrefixPath(prefix_path, True)
         qgs = QgsApplication([], False)
         qgs.initQgis()
         return qgs
@@ -45,16 +48,17 @@ def find_layer(project, layer_name):
         sys.exit(1)
 
 def modify_layer_colors_based_on_attribute(layer, attribute_name):
+
     try:
         # Define the rules and their expressions
         rules = [
             {"label": "Low Leakage (0 - 40%)", "expression": f'"{attribute_name}" >= 0 AND "{attribute_name}" < 0.40',
-             "color": "#0000FF", "width": 0.75},
+             "color": "#0000FF", "width": 0.75}, # Blue
             {"label": "Medium Leakage (40% - 60%)",
              "expression": f'"{attribute_name}" >= 0.40 AND "{attribute_name}" < 0.60',
-             "color": "#FFFF00","width": 0.75},
+             "color": "#FFFF00","width": 0.75}, # Yellow
             {"label": "High Leakage (60% - 100%)", "expression": f'"{attribute_name}" >= 0.60 AND "{attribute_name}" <= 1',
-             "color": "#FF0000","width": 0.75},
+             "color": "#FF0000","width": 0.75}, # Red
         ]
 
         # Create the root rule
@@ -82,11 +86,10 @@ def modify_layer_colors_based_on_attribute(layer, attribute_name):
 
         # Apply the new renderer to the layer
         layer.setRenderer(rule_based_renderer)
-        # print(f'layer color: {rule_based_renderer.rootRule().children()[1].symbol().symbolLayer(0).color().name()}')
-        # print(layer.setRenderer(rule_based_renderer))
 
         # Refresh the layer to apply changes
         layer.triggerRepaint()
+
 
         print("Rule-based symbology applied successfully.")
         return True
@@ -106,8 +109,6 @@ def save_project_to_postgis(project, uri):
   
 
 def reload_qgis_server(project_path,service_name):
-    
-
     # Restart the specific service
     try:
         subprocess.check_call(['docker','compose', '-f', f'{project_path}/docker-compose.yml', 'restart', service_name])
@@ -122,7 +123,7 @@ def main():
     # PostGIS database connection parameters
     db_params = {
         'dbname': 'qwc_services',
-        'host': 'localhost',
+        'host': '172.17.0.1',
         'port': '5432',
         'user': 'postgres',
         'password': 'admin',
@@ -134,7 +135,7 @@ def main():
 
     uri = (f"postgresql://{db_params['user']}:{db_params['password']}@{db_params['host']}:{db_params['port']}?sslmode=disable&dbname={db_params['dbname']}&schema={db_params['schema']}"
            f"&project={db_params['project']}")
-
+    
     project = load_project_from_postgis(uri)
 
     layer_name = "pipe"
@@ -146,16 +147,18 @@ def main():
         if success:
             save_project_to_postgis(project, uri)
             print("Successfully changed pipe layer colors based on attribute in PostGIS project")
+           
     else:
         print("Layer modification skipped due to missing layer")
 
+
     qgs.exitQgis()
     
-    # Specify your project name and the service (container) name to restart
-    # project_path = 'C:\Users\Emad\qwc-docker'
-    # service_name = 'qwc-qgis-server'
+    #  Specify your project name and the service (container) name to restart
+    project_path = '/home/emad47_n7/qwc-docker'
+    service_name = 'qwc-qgis-server'
     
-    # reload_qgis_server(project_path,service_name)
+    reload_qgis_server(project_path,service_name)
 
 
 if __name__ == "__main__":

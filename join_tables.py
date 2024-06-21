@@ -23,7 +23,7 @@ def load_data(db_params):
 
     # Load the GeoPackage layer
     # gdf1 = gpd.read_postgis('SELECT p_id, leakage_prob, geom FROM gis_data.pipes', engine, geom_col='geom')
-    gdf1 = pd.read_sql('SELECT p_id, probability FROM gis_data_test.pipes', engine)
+    gdf1 = pd.read_sql('SELECT p_id, probability FROM gis_data.pipe', engine)
 
     # Load the leakage probability table
     df2 = pd.read_sql('SELECT * FROM gis_data.leakage_prob', engine)
@@ -54,10 +54,10 @@ def execute_update(gdf1, db_params):
     cursor = conn.cursor()
 
     update_query = """
-        UPDATE gis_data_test.pipes
+        UPDATE gis_data.pipe
         SET probability = data.probability
         FROM (VALUES %s) AS data (id, probability)
-        WHERE pipes.p_id = data.id;
+        WHERE pipe.p_id = data.id;
     """
 
     update_data = list(zip(gdf1['p_id'], gdf1['probability']))
@@ -75,7 +75,7 @@ def main():
         'dbname': 'qwc_services',
         'user': 'postgres',
         'password': 'admin',
-        'host': 'localhost',
+        'host': '172.17.0.1',
         'port': '5432'
     }
 
