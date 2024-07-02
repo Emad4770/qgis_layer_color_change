@@ -19,3 +19,5 @@ find_layer(project, layer_name): This function finds a specific layer within a Q
 
 For linux put the postgres config file in ~/.pg_service.conf, and change the ip address to 172.17.0.1
 On Microsoft Windows, %APPDATA%\postgresql\.pg_service.conf
+
+run_scripts.sh can be used to set required permissions for the code to be able to use docker commands, it also runs the codes.
